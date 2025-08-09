@@ -1,0 +1,71 @@
+{
+    "default": {
+        "firstScene": "Sample01",
+        "sceneOrder": [
+            "Sample01",
+            "Sample02"
+        ],
+        "sceneFadeDuration": 1000,
+        "autoLoad": true
+    },
+    "scenes": {
+        "Sample01": {
+            "hfov": 100,
+            "pitch": 0,
+            "yaw": 0,
+            "type": "multires",
+            "preview": "./Sample01/1/f_0_0.jpg",
+            "multiRes": {
+                "basePath": "./Sample01/",
+                "path": "%l/%s_%y_%x",
+                "fallbackPath": "/fallback/%s",
+                "extension": "jpg",
+                "tileResolution": 512,
+                "maxLevel": 4,
+                "cubeResolution": 4096
+            },
+            "hotSpots": [
+                {
+                    "pitch": -7.2,
+                    "yaw": -0.1,
+                    "type": "scene",
+                    "text": "Sample02",
+                    "sceneId": "Sample02",
+                    "id": "hs_Sample02_001",
+                    "targetPitch": 0,
+                    "targetYaw": 0,
+                    "targetHfov": 100
+                }
+            ]
+        },
+        "Sample02": {
+            "hfov": 100,
+            "pitch": 0,
+            "yaw": 0,
+            "type": "multires",
+            "preview": "./Sample02/1/f_0_0.jpg",
+            "multiRes": {
+                "basePath": "./Sample02/",
+                "path": "%l/%s_%y_%x",
+                "fallbackPath": "/fallback/%s",
+                "extension": "jpg",
+                "tileResolution": 512,
+                "maxLevel": 4,
+                "cubeResolution": 4096
+            },
+            "hotSpots": [
+                {
+                    "pitch": -25.7,
+                    "yaw": 2.6,
+                    "type": "scene",
+                    "text": "Sample01",
+                    "sceneId": "Sample01",
+                    "id": "hs_Sample01_001",
+                    "targetPitch": 0,
+                    "targetYaw": 0,
+                    "targetHfov": 100
+                }
+            ]
+        }
+    }
+}

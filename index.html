@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pannellum Tour Editor</title>
+    <link rel="stylesheet" href="tour-editor.css">
+    <!-- <link rel="stylesheet" href="pannellum/pannellum.css"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+</head>
+<body>
+    <div class="editor-container">
+        <!-- Editor Panel -->
+        <div class="editor-panel">
+            <h2>Tour Editor</h2>
+
+            <!-- Configuration -->
+            <div class="section">
+                <h3>Configuration</h3>
+                <button id="importBtn" class="btn btn-secondary">Import</button>
+                <button id="exportBtn" class="btn btn-primary">Export</button>
+                <button id="copyBtn" class="btn btn-secondary">Copy</button>
+                <input type="file" id="importFile" accept=".json" style="display: none;">
+                <button id="previewBtn" class="btn btn-success">Preview</button>
+            </div>
+
+            <!-- Tour Settings -->
+            <div class="section">
+                <h3>Tour Settings</h3>
+                <div class="form-group">
+                    <label for="firstScene">First Scene:</label>
+                    <select id="firstScene" class="form-input">
+                        <option value="">Select first scene...</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Scene Management -->
+            <div class="section">
+                <h3>Scenes</h3>
+                <select id="sceneSelect" class="scene-select">
+                    <option value="">Select a scene...</option>
+                </select>
+                <button id="addSceneBtn" class="btn btn-primary">New</button>
+                <button id="editSceneBtn" class="btn btn-secondary" disabled>Edit</button>
+                <button id="deleteSceneBtn" class="btn btn-danger">Delete</button>
+                <button id="captureViewBtn" class="btn btn-success" disabled>Capture</button>
+            </div>
+
+
+            <!-- Hotspots -->
+            <div class="section" id="hotspotsSection" style="display: none;">
+                <h3>Hotspots</h3>
+                <div class="hotspot-info">
+                    <code>Cmd</code>/<code>Ctrl</code> + Click on the preview to add a hotspot
+                </div>
+                <div id="hotspotsList" class="hotspots-list"></div>
+            </div>
+
+            <!-- Scene Order Management -->
+            <div class="section collapsible-section">
+                <h3 class="section-header collapsible-header" id="sceneOrderHeader">
+                    <span>Scene Order</span>
+                    <button class="collapse-toggle" id="sceneOrderToggle">▼</button>
+                </h3>
+                <div class="collapsible-content" id="sceneOrderContent">
+                    <div class="scene-order-info">
+                        Drag scenes to reorder or use arrow buttons
+                    </div>
+                    <div id="sceneOrderList" class="scene-order-list">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview Panel -->
+        <div class="preview-panel">
+            <h2>Preview</h2>
+            <div class="preview-container">
+                <div id="panorama"></div>
+                <div id="nav-controls">
+                    <button id="prev-btn" class="nav-btn">←</button>
+                    <button id="next-btn" class="nav-btn">→</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Scene Modal -->
+    <div id="addSceneModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Add New Scene</h3>
+            <div class="form-group">
+                <label for="newSceneId">Scene ID:</label>
+                <input type="text" id="newSceneId" class="form-input" placeholder="scene1">
+            </div>
+            <div class="form-group">
+                <label for="newScenePath">Panorama Folder Path:</label>
+                <input type="text" id="newScenePath" class="form-input" placeholder="./Panorama_folder/">
+            </div>
+            <div class="form-group">
+                <label for="newSceneMaxLevel">Max Level:</label>
+                <input type="number" id="newSceneMaxLevel" class="form-input" value="4" min="1">
+            </div>
+            <div class="form-group">
+                <label for="newSceneCubeResolution">Cube Resolution:</label>
+                <input type="number" id="newSceneCubeResolution" class="form-input" value="4096" min="512">
+            </div>
+            <div class="modal-buttons">
+                <button id="confirmAddScene" class="btn btn-primary">Add Scene</button>
+                <button id="cancelAddScene" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Hotspot Modal -->
+    <div id="addHotspotModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Add Hotspot</h3>
+            <div class="form-group" id="hotspotIdGroup">
+                <label for="hotspotId">Hotspot ID:</label>
+                <input type="text" id="hotspotId" class="form-input" placeholder="auto-generated if empty">
+            </div>
+            <div class="form-group">
+                <label for="hotspotText">Hotspot Text:</label>
+                <input type="text" id="hotspotText" class="form-input" placeholder="Go to...">
+            </div>
+            <div class="form-group">
+                <label for="hotspotTarget">Target Scene:</label>
+                <select id="hotspotTarget" class="form-input">
+                    <option value="">Select target scene...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="hotspotPitch">Hotspot Pitch:</label>
+                <input type="number" id="hotspotPitch" class="form-input" value="0" min="-90" max="90">
+            </div>
+            <div class="form-group">
+                <label for="hotspotYaw">Hotspot Yaw:</label>
+                <input type="number" id="hotspotYaw" class="form-input" value="0" min="-180" max="180">
+            </div>
+            <div class="modal-buttons">
+                <button id="confirmAddHotspot" class="btn btn-primary">Add Hotspot</button>
+                <button id="cancelAddHotspot" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Scene Modal -->
+    <div id="editSceneModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Edit Scene</h3>
+            <div class="form-group">
+                <label for="editSceneId">Scene ID:</label>
+                <input type="text" id="editSceneId" class="form-input" placeholder="Enter scene ID">
+            </div>
+            <div class="form-group">
+                <label for="editScenePath">Panorama Path:</label>
+                <input type="text" id="editScenePath" class="form-input" placeholder="./Panorama_folder/">
+            </div>
+            <div class="form-group">
+                <label for="editSceneHfov">Initial HFOV:</label>
+                <input type="number" id="editSceneHfov" class="form-input" value="100" min="50" max="120">
+            </div>
+            <div class="form-group">
+                <label for="editScenePitch">Initial Pitch:</label>
+                <input type="number" id="editScenePitch" class="form-input" value="0" min="-90" max="90">
+            </div>
+            <div class="form-group">
+                <label for="editSceneYaw">Initial Yaw:</label>
+                <input type="number" id="editSceneYaw" class="form-input" value="0" min="-180" max="180">
+            </div>
+            <div class="form-group">
+                <label for="editSceneMaxLevel">Max Level:</label>
+                <input type="number" id="editSceneMaxLevel" class="form-input" value="4" min="1">
+            </div>
+            <div class="form-group">
+                <label for="editSceneCubeResolution">Cube Resolution:</label>
+                <input type="number" id="editSceneCubeResolution" class="form-input" value="4096" min="512">
+            </div>
+            <div class="modal-buttons">
+                <button id="confirmEditScene" class="btn btn-primary">Update Scene</button>
+                <button id="cancelEditScene" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- <script src="pannellum/pannellum.js"></script> -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <script src="tour-editor.js"></script>
+</body>
+</html>
